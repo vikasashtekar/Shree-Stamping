@@ -12,12 +12,15 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNaf2LojpYMsqgmxM1K
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EMPLOYEES = [
-  'Ahmed Khan',
-  'Priya Sharma',
-  'Rahul Mehta',
-  'Sneha Patel',
-  'Vikram Nair',
-  'Deepa Iyer',
+  'RUSHI JADHAV',
+  'Samadhan Survase',
+  'C Basarkar',
+  'AKHILESH OJHA',
+  'Suresh Dhawale',
+  'Mousmi Ghosh',
+  'DEEPAK TIMALSINA',
+  'SAMBHAJI PAGIRE',
+  
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
