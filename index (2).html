@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ERP Task Tracker</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #f5f5f4;
+      --bg3: #eeede8;
+      --text: #1a1a18;
+      --text2: #6b6b67;
+      --text3: #9b9b96;
+      --border: rgba(0,0,0,0.12);
+      --border2: rgba(0,0,0,0.22);
+      --radius: 8px;
+      --radius-lg: 12px;
+      --blue-bg: #E6F1FB; --blue-text: #185FA5;
+      --green-bg: #EAF3DE; --green-text: #3B6D11;
+      --amber-bg: #FAEEDA; --amber-text: #854F0B;
+      --red-bg: #FCEBEB; --red-text: #A32D2D;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1a; --bg2: #262624; --bg3: #303030;
+        --text: #f0f0ec; --text2: #a0a09c; --text3: #686864;
+        --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
+        --blue-bg: #0C447C; --blue-text: #B5D4F4;
+        --green-bg: #27500A; --green-text: #C0DD97;
+        --amber-bg: #633806; --amber-text: #FAC775;
+        --red-bg: #791F1F; --red-text: #F7C1C1;
+      }
+    }
+
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg2); color: var(--text); font-size: 15px; line-height: 1.5; min-height: 100vh; }
+
+    header { background: var(--bg); border-bottom: 0.5px solid var(--border); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { width: 34px; height: 34px; background: var(--text); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; }
+    .logo-icon i { color: var(--bg); font-size: 18px; }
+    .logo-text { font-size: 16px; font-weight: 500; }
+    .logo-sub { font-size: 12px; color: var(--text2); }
+    .header-right { display: flex; gap: 8px; align-items: center; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+
+    .tabs { display: flex; gap: 0; border-bottom: 0.5px solid var(--border); margin-bottom: 20px; background: var(--bg); border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: 0 4px; }
+    .tab { padding: 12px 20px; font-size: 14px; cursor: pointer; border: none; background: none; color: var(--text2); border-bottom: 2px solid transparent; margin-bottom: -0.5px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: color 0.15s; }
+    .tab.active { color: var(--text); border-bottom-color: var(--text); }
+    .tab:hover:not(.active) { color: var(--text); }
+
+    .card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 20px 24px; }
+    .section { display: none; } .section.active { display: block; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    label { font-size: 12px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.03em; }
+    input, select, textarea { width: 100%; padding: 9px 11px; border: 0.5px solid var(--border); border-radius: var(--radius); background: var(--bg2); color: var(--text); font-size: 14px; font-family: inherit; transition: border-color 0.12s; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--border2); background: var(--bg); }
+    input[readonly] { opacity: 0.7; cursor: default; }
+    textarea { resize: vertical; min-height: 80px; }
+    select option { background: var(--bg); }
+
+    .btn { padding: 9px 16px; border-radius: var(--radius); font-size: 13px; cursor: pointer; border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); font-family: inherit; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.12s; }
+    .btn:hover { background: var(--bg2); }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .btn-primary:hover { opacity: 0.85; background: var(--text); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-danger { color: var(--red-text); border-color: transparent; }
+    .btn-danger:hover { background: var(--red-bg); }
+
+    .ss-area { border: 1.5px dashed var(--border2); border-radius: var(--radius); padding: 18px; text-align: center; cursor: pointer; min-height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: var(--text2); font-size: 13px; position: relative; overflow: hidden; transition: border-color 0.15s; }
+    .ss-area:hover { border-color: var(--text2); }
+    .ss-area img { max-width: 100%; max-height: 130px; border-radius: 4px; }
+    .ss-area input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+    .form-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-top: 16px; border-top: 0.5px solid var(--border); }
+    .form-actions { display: flex; gap: 8px; }
+
+    .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 18px; border-radius: var(--radius); font-size: 14px; font-weight: 500; z-index: 999; display: none; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+    .toast.ok { background: var(--green-bg); color: var(--green-text); display: flex; }
+    .toast.err { background: var(--red-bg); color: var(--red-text); display: flex; }
+
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+    .stat-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; }
+    .stat-label { font-size: 12px; color: var(--text2); font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px; }
+    .stat-val { font-size: 26px; font-weight: 500; }
+
+    .filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .filter-row select, .filter-row input[type=date] { width: auto; flex: 1; min-width: 130px; font-size: 13px; padding: 7px 10px; }
+
+    .table-wrap { overflow-x: auto; border: 0.5px solid var(--border); border-radius: var(--radius-lg); background: var(--bg); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 12px; font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 0.5px solid var(--border); background: var(--bg2); }
+    td { padding: 10px 12px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--bg2); }
+
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+    .badge-pending { background: var(--amber-bg); color: var(--amber-text); }
+    .badge-in_progress { background: var(--blue-bg); color: var(--blue-text); }
+    .badge-done { background: var(--green-bg); color: var(--green-text); }
+    .badge-blocked { background: var(--red-bg); color: var(--red-text); }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: var(--bg3); color: var(--text2); }
+    .priority-high { background: var(--red-bg); color: var(--red-text); }
+    .priority-low { background: var(--green-bg); color: var(--green-text); }
+
+    .thumb { width: 38px; height: 30px; border-radius: 4px; overflow: hidden; cursor: pointer; border: 0.5px solid var(--border); }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    .empty { text-align: center; padding: 48px 20px; color: var(--text3); }
+    .empty i { font-size: 36px; display: block; margin-bottom: 10px; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 200; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: var(--bg); border-radius: var(--radius-lg); padding: 20px; max-width: 520px; width: 92%; }
+    .modal-box img { width: 100%; border-radius: var(--radius); margin-top: 12px; }
+
+    .spinner { width: 16px; height: 16px; border: 2px solid var(--border2); border-top-color: var(--text); border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .config-banner { background: var(--amber-bg); color: var(--amber-text); border-radius: var(--radius-lg); padding: 14px 18px; margin-bottom: 18px; font-size: 13px; display: flex; align-items: flex-start; gap: 10px; }
+    .config-banner i { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .full { grid-column: 1; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      header { padding: 12px 14px; }
+      .container { padding: 14px 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-clipboard-list"></i></div>
+    <div>
+      <div class="logo-text">ERP Task Tracker</div>
+      <div class="logo-sub">End User Support Log</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="btn btn-sm" onclick="exportExcel()"><i class="ti ti-file-spreadsheet"></i> Export Excel</button>
+    <button class="btn btn-sm" onclick="loadTasks()"><i class="ti ti-refresh"></i> Refresh</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Config warning shown until script URL is set -->
+  <div class="config-banner" id="config-banner">
+    <i class="ti ti-alert-triangle"></i>
+    <div>
+      <strong>Setup required:</strong> Open <code>config.js</code> and paste your Google Apps Script URL.
+      Follow the <code>SETUP_GUIDE.md</code> file included in this project.
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tab-btn-add" onclick="switchTab('add', this)"><i class="ti ti-plus"></i> Add Task</button>
+    <button class="tab" id="tab-btn-report" onclick="switchTab('report', this)"><i class="ti ti-list-details"></i> Report</button>
+  </div>
+
+  <!-- ── ADD TASK ── -->
+  <div id="tab-add" class="section active">
+    <div class="card">
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label>Employee Name</label>
+          <select id="emp-name">
+            <option value="">Select employee…</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="task-date" readonly />
+        </div>
+
+        <div class="form-group full">
+          <label>Task Description</label>
+          <textarea id="task-desc" placeholder="Describe the support provided or task completed…"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>ERP Module / Category</label>
+          <select id="task-module">
+            <option value="">Select module…</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select id="task-status">
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Done">Done</option>
+            <option value="Blocked">Blocked</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Priority</label>
+          <select id="task-priority">
+            <option value="Normal">Normal</option>
+            <option value="High">High</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Time Spent (hrs)</label>
+          <input type="number" id="task-hours" placeholder="e.g. 1.5" min="0" step="0.25" />
+        </div>
+
+        <div class="form-group full">
+          <label>Screenshot (optional)</label>
+          <div class="ss-area" id="ss-area">
+            <i class="ti ti-photo-up" style="font-size:26px;"></i>
+            <span>Click or drag to upload screenshot</span>
+            <input type="file" accept="image/*" id="ss-input" onchange="handleScreenshot(event)" />
+          </div>
+        </div>
+
+      </div><!-- /form-grid -->
+
+      <div class="form-footer">
+        <span style="font-size:12px;color:var(--text3);">Data saves to Google Sheets automatically</span>
+        <div class="form-actions">
+          <button class="btn" onclick="clearForm()"><i class="ti ti-eraser"></i> Clear</button>
+          <button class="btn btn-primary" id="save-btn" onclick="saveTask()">
+            <i class="ti ti-device-floppy"></i> Save Task
+          </button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-add -->
+
+  <!-- ── REPORT ── -->
+  <div id="tab-report" class="section">
+
+    <div class="stats-row" id="stats-row">
+      <div class="stat-card"><div class="stat-label">Total Tasks</div><div class="stat-val" id="s-total">—</div></div>
+      <div class="stat-card"><div class="stat-label">Done</div><div class="stat-val" id="s-done" style="color:var(--green-text);">—</div></div>
+      <div class="stat-card"><div class="stat-label">In Progress</div><div class="stat-val" id="s-wip" style="color:var(--blue-text);">—</div></div>
+      <div class="stat-card"><div class="stat-label">Total Hours</div><div class="stat-val" id="s-hrs">—</div></div>
+    </div>
+
+    <div class="filter-row">
+      <select id="f-status" onchange="renderTable()">
+        <option value="">All statuses</option>
+        <option>Pending</option>
+        <option>In Progress</option>
+        <option>Done</option>
+        <option>Blocked</option>
+      </select>
+      <select id="f-emp" onchange="renderTable()"><option value="">All employees</option></select>
+      <select id="f-module" onchange="renderTable()"><option value="">All modules</option></select>
+      <input type="date" id="f-from" onchange="renderTable()" title="From date" />
+      <input type="date" id="f-to" onchange="renderTable()" title="To date" />
+      <button class="btn btn-sm" onclick="clearFilters()"><i class="ti ti-filter-off"></i></button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date</th>
+            <th>Employee</th>
+            <th>Module</th>
+            <th>Task</th>
+            <th>Hrs</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>SS</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="report-body"></tbody>
+      </table>
+      <div id="report-empty" class="empty" style="display:none;">
+        <i class="ti ti-clipboard-off"></i>
+        <div id="empty-msg">No tasks yet. Add your first task above.</div>
+      </div>
+    </div>
+
+  </div><!-- /tab-report -->
+
+</div><!-- /container -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Image modal -->
+<div class="modal-overlay" id="img-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-weight:500;font-size:14px;">Screenshot</span>
+      <button class="btn btn-sm" onclick="document.getElementById('img-modal').classList.remove('open')"><i class="ti ti-x"></i></button>
+    </div>
+    <img id="modal-img" src="" alt="Task screenshot" />
+  </div>
+</div>
+
+<!-- Load SheetJS for Excel export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Config file — user sets SCRIPT_URL here -->
+<script src="config.js"></script>
+
+<script>
+// ── CONFIG (fallback if config.js missing) ──────────────────────
+if (typeof SCRIPT_URL === 'undefined') window.SCRIPT_URL = '';
+if (typeof EMPLOYEES === 'undefined') window.EMPLOYEES = ['Ahmed Khan','Priya Sharma','Rahul Mehta','Sneha Patel','Vikram Nair','Deepa Iyer'];
+if (typeof MODULES === 'undefined') window.MODULES = ['Finance (FI)','Controlling (CO)','Sales & Distribution (SD)','Material Management (MM)','Production Planning (PP)','Human Resources (HR)','Basis / Technical','General Support','Testing / UAT','Training'];
+
+// ── STATE ───────────────────────────────────────────────────────
+let allTasks = [];
+let ssDataUrl = null;
+
+// ── INIT ────────────────────────────────────────────────────────
+function init() {
+  document.getElementById('task-date').value = new Date().toISOString().split('T')[0];
+
+  // Populate dropdowns from config
+  const empSel = document.getElementById('emp-name');
+  EMPLOYEES.forEach(e => empSel.appendChild(new Option(e, e)));
+  const modSel = document.getElementById('task-module');
+  MODULES.forEach(m => modSel.appendChild(new Option(m, m)));
+
+  if (SCRIPT_URL && SCRIPT_URL !== 'YOUR_SCRIPT_URL_HERE') {
+    document.getElementById('config-banner').style.display = 'none';
+    loadTasks();
+  }
+}
+
+// ── TAB SWITCH ──────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'report') { populateFilterDropdowns(); renderTable(); }
+}
+
+// ── SCREENSHOT ──────────────────────────────────────────────────
+function handleScreenshot(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    ssDataUrl = ev.target.result;
+    const area = document.getElementById('ss-area');
+    area.innerHTML = `<img src="${ssDataUrl}" alt="preview" /><input type="file" accept="image/*" id="ss-input" onchange="handleScreenshot(event)" />`;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── SAVE TASK ────────────────────────────────────────────────────
+async function saveTask() {
+  const emp    = document.getElementById('emp-name').value;
+  const desc   = document.getElementById('task-desc').value.trim();
+  const mod    = document.getElementById('task-module').value;
+  const status = document.getElementById('task-status').value;
+  const date   = document.getElementById('task-date').value;
+  const hours  = document.getElementById('task-hours').value;
+  const priority = document.getElementById('task-priority').value;
+
+  if (!emp)  { showToast('Please select an employee.', 'err'); return; }
+  if (!desc) { showToast('Please enter a task description.', 'err'); return; }
+  if (!mod)  { showToast('Please select a module.', 'err'); return; }
+  if (!SCRIPT_URL || SCRIPT_URL === 'YOUR_SCRIPT_URL_HERE') {
+    showToast('Google Script URL not configured. See config.js', 'err'); return;
+  }
+
+  const btn = document.getElementById('save-btn');
+  btn.innerHTML = '<span class="spinner"></span> Saving…';
+  btn.disabled = true;
+
+  const payload = { action: 'addTask', emp, desc, mod, status, date, hours, priority, screenshot: ssDataUrl || '' };
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    showToast('Task saved to Google Sheets!', 'ok');
+    clearForm();
+    setTimeout(loadTasks, 1200);
+  } catch (err) {
+    showToast('Error saving. Check your Script URL.', 'err');
+  } finally {
+    btn.innerHTML = '<i class="ti ti-device-floppy"></i> Save Task';
+    btn.disabled = false;
+  }
+}
+
+// ── LOAD TASKS ───────────────────────────────────────────────────
+async function loadTasks() {
+  if (!SCRIPT_URL || SCRIPT_URL === 'YOUR_SCRIPT_URL_HERE') return;
+  try {
+    const res = await fetch(SCRIPT_URL + '?action=getTasks');
+    const data = await res.json();
+    allTasks = data.tasks || [];
+    populateFilterDropdowns();
+    renderTable();
+    updateStats();
+  } catch (err) {
+    showToast('Could not load tasks. Check Script URL.', 'err');
+  }
+}
+
+// ── DELETE TASK ──────────────────────────────────────────────────
+async function deleteTask(rowIndex) {
+  if (!confirm('Delete this task?')) return;
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'deleteTask', rowIndex })
+    });
+    showToast('Task deleted.', 'ok');
+    setTimeout(loadTasks, 800);
+  } catch(e) {
+    showToast('Error deleting task.', 'err');
+  }
+}
+
+// ── RENDER TABLE ─────────────────────────────────────────────────
+function renderTable() {
+  const fStatus = document.getElementById('f-status').value;
+  const fEmp    = document.getElementById('f-emp').value;
+  const fMod    = document.getElementById('f-module').value;
+  const fFrom   = document.getElementById('f-from').value;
+  const fTo     = document.getElementById('f-to').value;
+
+  const filtered = allTasks.filter(t => {
+    if (fStatus && t.status !== fStatus) return false;
+    if (fEmp && t.emp !== fEmp) return false;
+    if (fMod && t.mod !== fMod) return false;
+    if (fFrom && t.date < fFrom) return false;
+    if (fTo && t.date > fTo) return false;
+    return true;
+  });
+
+  const tbody = document.getElementById('report-body');
+  const empty = document.getElementById('report-empty');
+
+  if (!filtered.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    document.getElementById('empty-msg').textContent = allTasks.length
+      ? 'No tasks match your filters.' : 'No tasks yet. Add your first task above.';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const statusKey = s => s.toLowerCase().replace(' ', '_');
+  const pClass = p => p === 'High' ? 'priority-high' : p === 'Low' ? 'priority-low' : '';
+
+  tbody.innerHTML = filtered.map((t, i) => `
+    <tr>
+      <td style="color:var(--text3);font-size:11px;">${i + 1}</td>
+      <td style="white-space:nowrap;font-size:12px;">${t.date || ''}</td>
+      <td style="font-weight:500;">${t.emp || ''}</td>
+      <td><span class="tag">${(t.mod || '').split(' (')[0]}</span></td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${t.desc || ''}">${t.desc || ''}</td>
+      <td style="text-align:right;">${t.hours || '—'}</td>
+      <td><span class="tag ${pClass(t.priority)}">${t.priority || 'Normal'}</span></td>
+      <td><span class="badge badge-${statusKey(t.status || 'pending')}">${t.status || 'Pending'}</span></td>
+      <td>${t.screenshot ? `<div class="thumb" onclick="viewImg(${i})"><img src="${t.screenshot}" alt="ss"/></div>` : '<span style="color:var(--text3);">—</span>'}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="deleteTask(${t.rowIndex})"><i class="ti ti-trash"></i></button></td>
+    </tr>
+  `).join('');
+
+  updateStats();
+}
+
+// ── STATS ────────────────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('s-total').textContent = allTasks.length;
+  document.getElementById('s-done').textContent  = allTasks.filter(t => t.status === 'Done').length;
+  document.getElementById('s-wip').textContent   = allTasks.filter(t => t.status === 'In Progress').length;
+  const hrs = allTasks.reduce((s, t) => s + (parseFloat(t.hours) || 0), 0);
+  document.getElementById('s-hrs').textContent = hrs.toFixed(1);
+}
+
+// ── FILTER DROPDOWNS ─────────────────────────────────────────────
+function populateFilterDropdowns() {
+  const emps = [...new Set(allTasks.map(t => t.emp).filter(Boolean))];
+  const mods = [...new Set(allTasks.map(t => t.mod).filter(Boolean))];
+  const fEmp = document.getElementById('f-emp');
+  const fMod = document.getElementById('f-module');
+  const ce = fEmp.value, cm = fMod.value;
+  fEmp.innerHTML = '<option value="">All employees</option>' + emps.map(e => `<option ${e===ce?'selected':''}>${e}</option>`).join('');
+  fMod.innerHTML = '<option value="">All modules</option>' + mods.map(m => `<option ${m===cm?'selected':''}>${m}</option>`).join('');
+}
+
+function clearFilters() {
+  ['f-status','f-emp','f-module','f-from','f-to'].forEach(id => document.getElementById(id).value = '');
+  renderTable();
+}
+
+// ── IMAGE MODAL ──────────────────────────────────────────────────
+function viewImg(i) {
+  const fStatus = document.getElementById('f-status').value;
+  const fEmp = document.getElementById('f-emp').value;
+  const fMod = document.getElementById('f-module').value;
+  const filtered = allTasks.filter(t => {
+    if (fStatus && t.status !== fStatus) return false;
+    if (fEmp && t.emp !== fEmp) return false;
+    if (fMod && t.mod !== fMod) return false;
+    return true;
+  });
+  if (!filtered[i]?.screenshot) return;
+  document.getElementById('modal-img').src = filtered[i].screenshot;
+  document.getElementById('img-modal').classList.add('open');
+}
+
+// ── CLEAR FORM ───────────────────────────────────────────────────
+function clearForm() {
+  document.getElementById('emp-name').value = '';
+  document.getElementById('task-desc').value = '';
+  document.getElementById('task-module').value = '';
+  document.getElementById('task-status').value = 'Pending';
+  document.getElementById('task-priority').value = 'Normal';
+  document.getElementById('task-hours').value = '';
+  document.getElementById('task-date').value = new Date().toISOString().split('T')[0];
+  ssDataUrl = null;
+  document.getElementById('ss-area').innerHTML = `
+    <i class="ti ti-photo-up" style="font-size:26px;"></i>
+    <span>Click or drag to upload screenshot</span>
+    <input type="file" accept="image/*" id="ss-input" onchange="handleScreenshot(event)" />`;
+}
+
+// ── EXPORT EXCEL ─────────────────────────────────────────────────
+function exportExcel() {
+  if (!allTasks.length) { showToast('No tasks to export.', 'err'); return; }
+  const rows = allTasks.map((t, i) => ({
+    '#': i + 1, 'Date': t.date, 'Employee': t.emp,
+    'Module': t.mod, 'Task Description': t.desc,
+    'Hours': t.hours || '', 'Priority': t.priority, 'Status': t.status
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [4,12,20,24,50,8,10,14].map(w => ({ wch: w }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Tasks');
+  XLSX.writeFile(wb, `ERP_Tasks_${new Date().toISOString().split('T')[0]}.xlsx`);
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+
+init();
+</script>
+</body>
+</html>
